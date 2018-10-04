@@ -474,6 +474,7 @@ ModelImporter:
     4300112: l_kneeProxy_geo
     4300114: l_hipProxy_geo
     7400000: HumanoidWalk
+    7400002: Take 001
     9500000: //RootNode
   materials:
     importMaterials: 0
