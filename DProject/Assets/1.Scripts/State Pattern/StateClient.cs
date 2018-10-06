@@ -10,14 +10,14 @@ public class StateClient : StateMachine
     //public FireBall fireball = null;
     //public Transform skillStartPosition = null;
 
-    private Rigidbody rb = null;
-    private Collider col = null;
+    private Rigidbody rigidbody = null;
+    private Collider collider = null;
 
     public float hitDistance = 0.35f;
     public LayerMask groundLayers;
 
     public bool grounded = true;
-    private bool canAttack = true;
+    //private bool canAttack = true;
     private bool inputJump = false;
     private bool inputAttack = false;
 
@@ -31,10 +31,10 @@ public class StateClient : StateMachine
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
+        rigidbody = GetComponent<Rigidbody>();
+        collider = GetComponent<Collider>();
 
-        if (col == null) Debug.LogError(name + "-- StateClient.cs -- Collider가 존재하지 않습니다.");
+        if (collider == null) Debug.LogError(name + "-- StateClient.cs -- Collider가 존재하지 않습니다.");
     }
 
     private bool EventCheckMove() { return IsMoving() == true; }
@@ -42,8 +42,8 @@ public class StateClient : StateMachine
     private bool EventCheckJumpRequest() { return IsGround() == true && inputJump == true; }
     private bool EventCheckIsJumping() { return IsGround() == false; }
     private bool EventCheckJumpFinished() { return IsGround() == true && strState == "JUMP"; }
-    private bool EventCheckAttackRequest() { return inputAttack == true && attackCoolDownRemaining() <= 0f; }
-    private bool EventCheckAttackCastingFinished() { return strState == "ATTACK" && attackCastTimeRemaining() <= 0f; }
+    //private bool EventCheckAttackRequest() { return inputAttack == true && attackCoolDownRemaining() <= 0f; }
+    //private bool EventCheckAttackCastingFinished() { return strState == "ATTACK" && attackCastTimeRemaining() <= 0f; }
 
     private bool IsMoving()
     {
@@ -51,17 +51,16 @@ public class StateClient : StateMachine
         (Input.GetKey(KeyCode.S)) ||
         (Input.GetKey(KeyCode.A)) ||
         (Input.GetKey(KeyCode.D));
+
     }
+
     private bool IsGround()
     {
 
         if (grounded) hitDistance = 0.35f;
         else hitDistance = 0.15f;
 
-        if (Physics.Raycast(transform.position - new Vector3(0f, 0.85f, 0f),
-                            -transform.up,
-                            hitDistance,
-                            groundLayers))
+        if (Physics.Raycast(transform.position - new Vector3(0f, -0.85f, 0f), transform.up, hitDistance, groundLayers))
         {
             return (grounded = true);
         }
@@ -84,11 +83,11 @@ public class StateClient : StateMachine
             return "JUMP";
         }
 
-        if (EventCheckAttackRequest())
-        {
-            attackCastTimeEnd = Time.time + attackCastTime;
-            return "ATTACK";
-        }
+        //if (EventCheckAttackRequest())
+        //{
+        //    attackCastTimeEnd = Time.time + attackCastTime;
+        //    return "ATTACK";
+        //}
 
         if (EventCheckMove())
         {
@@ -97,7 +96,7 @@ public class StateClient : StateMachine
 
         if (EventCheckMoveEnd()) { }
         if (EventCheckJumpFinished()) { }
-        if (EventCheckAttackCastingFinished()) { }
+        //if (EventCheckAttackCastingFinished()) { }
 
         return "IDLE";
     }
@@ -114,11 +113,11 @@ public class StateClient : StateMachine
             return "JUMP";
         }
 
-        if (EventCheckAttackRequest())
-        {
-            attackCastTimeEnd = Time.time + attackCastTime;
-            return "ATTACK";
-        }
+        //if (EventCheckAttackRequest())
+        //{
+        //    attackCastTimeEnd = Time.time + attackCastTime;
+        //    return "ATTACK";
+        //}
 
         if (EventCheckMoveEnd())
         {
@@ -127,7 +126,7 @@ public class StateClient : StateMachine
 
         if (EventCheckMove()) { }
         if (EventCheckJumpFinished()) { }
-        if (EventCheckAttackCastingFinished()) { }
+        //if (EventCheckAttackCastingFinished()) { }
 
         return "MOVE";
     }
@@ -141,40 +140,40 @@ public class StateClient : StateMachine
 
         if (EventCheckJumpRequest()) { }
         if (EventCheckIsJumping()) { }
-        if (EventCheckAttackRequest()) { }
+        //if (EventCheckAttackRequest()) { }
         if (EventCheckMove()) { }
         if (EventCheckMoveEnd()) { }
-        if (EventCheckAttackCastingFinished()) { }
+        //if (EventCheckAttackCastingFinished()) { }
 
         return "JUMP";
     }
 
-    private string UpdateATTACK()
-    {
+    //private string UpdateATTACK()
+    //{
 
-        if (EventCheckAttackCastingFinished())
-        {
-            attackCoolDownEnd = Time.time + attackCoolDown;
-            //CastAttack();
-            return "IDLE";
-        }
+    //    if (EventCheckAttackCastingFinished())
+    //    {
+    //        attackCoolDownEnd = Time.time + attackCoolDown;
+    //        //CastAttack ();
+    //        return "IDLE";
+    //    }
 
-        if (EventCheckJumpRequest()) { }
-        if (EventCheckIsJumping()) { }
-        if (EventCheckAttackRequest()) { }
-        if (EventCheckMove()) { }
-        if (EventCheckMoveEnd()) { }
-        if (EventCheckJumpFinished()) { }
+    //    if (EventCheckJumpRequest()) { }
+    //    if (EventCheckIsJumping()) { }
+    //    //if (EventCheckAttackRequest()) { }
+    //    if (EventCheckMove()) { }
+    //    if (EventCheckMoveEnd()) { }
+    //    if (EventCheckJumpFinished()) { }
 
-        return "ATTACK";
-    }
+    //    return "ATTACK";
+    //}
 
     protected override string UpdateState()
     {
         if (strState == "IDLE") return UpdateIDLE();
         if (strState == "MOVE") return UpdateMOVE();
         if (strState == "JUMP") return UpdateJUMP();
-        if (strState == "ATTACK") return UpdateATTACK();
+        //if (strState == "ATTACK") return UpdateATTACK();
 
         Debug.LogError(name + " -- StateClient::UpdateState -- No state named: " + strState);
         return null;
@@ -183,8 +182,7 @@ public class StateClient : StateMachine
     protected override void UpdateHandle()
     {
 
-        if (strState == "IDLE" ||
-            strState == "MOVE")
+        if (strState == "IDLE" || strState == "MOVE")
         {
             MoveHandling();
             JumpHandling();
@@ -214,15 +212,14 @@ public class StateClient : StateMachine
 
     private void JumpHandling()
     {
-
         inputJump = false;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && rigidbody.velocity.y == 0)
         {
-
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            rigidbody.AddForce(transform.up * jumpForce);
             inputJump = true;
         }
+        
     }
 
     private void AttackHandling()
@@ -232,7 +229,6 @@ public class StateClient : StateMachine
 
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-
             inputAttack = true;
         }
     }

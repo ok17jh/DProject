@@ -11,7 +11,6 @@ public abstract class StateMachine : MonoBehaviour
 
     protected void FixedUpdate()
     {
-
         UpdateHandle();
         strState = UpdateState();
     }
